@@ -4,12 +4,12 @@
 <img alt="CONTIGuator" src="{{ url_for('static', filename='img/logoweb.png') }}" class="bg-container img-responsive" />
 {% endblock %}
 {% block menu %}
-            <a class="btn btn-success" href="/archive/{{ req_id }}">
+            <a class="btn btn-success" href="/contiguator/archive/{{ req_id }}">
               <span class="glyphicon glyphicon-save"></span>
                Download the results
             </a>
 
-            <a class="btn btn-primary" href="/">
+            <a class="btn btn-primary" href="/contiguator/">
               <span class="glyphicon glyphicon-repeat"></span>
                Launch a new job
             </a>
@@ -123,7 +123,7 @@
     </table>
   </div>
   <div class="col-md-6">
-    <a class="btn btn-danger" href="/unmapped/{{ req_id }}">
+    <a class="btn btn-danger" href="/contiguator/unmapped/{{ req_id }}">
               <span class="glyphicon glyphicon-remove"></span>
                Unmapped contigs
             </a>
@@ -165,20 +165,20 @@
     </table>
   </div>
   <div class="col-md-6">
-    <a class="btn btn-primary" href="/mapped/{{ req_id }}/{{ m['dir'] }}">
+    <a class="btn btn-primary" href="/contiguator/mapped/{{ req_id }}/{{ m['dir'] }}">
               <span class="glyphicon glyphicon-ok"></span>
                Mapped contigs
             </a> 
-    <a class="btn btn-success" href="/pdf/{{ req_id }}/{{ m['dir'] }}/{{ m['pdf'] }}">
+    <a class="btn btn-success" href="/contiguator/pdf/{{ req_id }}/{{ m['dir'] }}/{{ m['pdf'] }}">
               <span class="glyphicon glyphicon-picture"></span>
                Map in PDF
             </a> 
-    <a class="btn btn-info" href="/scaffold/{{ req_id }}/{{ m['dir'] }}">
+    <a class="btn btn-info" href="/contiguator/scaffold/{{ req_id }}/{{ m['dir'] }}">
               <span class="glyphicon glyphicon-repeat"></span>
                Scaffold FASTA
             </a>
     {% if 'pcr' in m %}
-    <a class="btn btn-default" href="/pcr/{{ req_id }}/{{ m['dir'] }}">
+    <a class="btn btn-default" href="/contiguator/pcr/{{ req_id }}/{{ m['dir'] }}">
               <span class="glyphicon glyphicon-list"></span>
                PCR primers
             </a> 
@@ -187,11 +187,11 @@
   </div>
 </div>
 <div class="row">
-<img src="/png/{{ req_id }}/{{ m['dir'] }}/{{ m['png'] }}" class="img-responsive" /> 
-    <a class="btn btn-default btn-sm" href="/png/{{ req_id }}/{{ m['dir'] }}/{{ m['png'].replace('_small.png', '.png') }}">
+<img src="/contiguator/png/{{ req_id }}/{{ m['dir'] }}/{{ m['png'] }}" class="img-responsive" /> 
+    <a class="btn btn-default btn-sm" href="/contiguator/png/{{ req_id }}/{{ m['dir'] }}/{{ m['png'].replace('_small.png', '.png') }}">
                Larger
             </a> 
-    <a class="btn btn-default btn-sm" href="/legend">
+    <a class="btn btn-default btn-sm" href="/contiguator/legend">
                Legend
             </a> 
 

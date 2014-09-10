@@ -29,7 +29,7 @@ First, install all the dependencies
 
     sudo pip install -r requirements.txt
 
-Then install in apache the medusa.conf file (changing the paths).
+Then install in apache the contiguator.conf file (changing the paths).
 Move the celeryd.conf file in /etc/default/celeryd, and install the celeryd script in /etc/init.d, using your OS command to install the service.
 
 Create a production.py file which can then be used to override the settings.py debug options.
