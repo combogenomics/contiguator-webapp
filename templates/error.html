@@ -1,0 +1,44 @@
+{% extends "template.html" %}
+{% block title %}CONTIGuator job error!{% endblock %}
+{% block himg %}
+<img alt="CONTIGuator" src="{{ url_for('static', filename='img/failweb.png') }}" class="bg-container img-responsive" />
+{% endblock %}
+{% block container %}
+      <div class="container">
+
+        <div class="row">
+          <div class="col-md-6 col-md-offset-3">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+              <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <strong>{{ category }}</strong> {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+            <h3>There was a problem with your CONTIGuator job!</h3>
+            <h4>Are you sure that you provided the input files in FASTA format?</h4>
+            <p>You can have a look at the logs and send them to the web-masters</p>
+
+            <a class="btn btn-warning btn-lg btn-block" href="/log/{{ req_id }}">
+              <span class="glyphicon glyphicon-eye-open"></span>
+               Have a look at the log
+            </a>
+
+            <a class="btn btn-danger btn-lg btn-block" href="/err/{{ req_id }}">
+              <span class="glyphicon glyphicon-eye-open"></span>
+               Have a look at the error log
+            </a>
+
+            <a class="btn btn-primary btn-lg btn-block" href="/">
+              <span class="glyphicon glyphicon-repeat"></span>
+               Launch a new job
+            </a>
+
+          </div> <!-- /col -->
+        </div> <!-- /row -->
+
+      </div> <!-- /container -->
+{% endblock %}

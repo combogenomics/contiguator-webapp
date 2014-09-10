@@ -1,0 +1,35 @@
+{% extends "template.html" %}
+{% block title %}Medusa Server job recovery{% endblock %}
+{% block container %}
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 col-md-offset-3">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+              <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <strong>{{ category }}</strong> {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+              <form role="form" method="post"
+                   action="{{ req_id }}">
+              <h2>Results retrieval</h2>
+              <div class="form-group">
+                <label for="password">Passphrase</label>
+                <input type="password" class="form-control" name="passphrase" placeholder="Open sesam">
+                <h6 class="text-muted">
+                  <span class="glyphicon glyphicon-warning-sign"> </span>
+                  By default the results page is visible to anyone that knows the page URL. Using a passphrase will ensures a better privacy on your analysis. Hopefully your collaborator has sent you the passphrase.
+                </h6>
+              </div>
+              
+              <button class="btn btn-lg btn-primary btn-block" type="submit">Retrieve results</button>
+            </form>
+          </div> <!-- /col -->
+        </div> <!-- /row -->
+
+      </div> <!-- /container -->
+{% endblock %}

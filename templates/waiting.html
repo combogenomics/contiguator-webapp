@@ -1,0 +1,18 @@
+{% extends "template.html" %}
+{% block title %}CONTIGuator job running...{% endblock %}
+{% block himg %}
+<img alt="CONTIGuator" src="{{ url_for('static', filename='img/waitingweb.gif') }}" class="bg-container img-responsive" />
+{% endblock %}
+{% block container %}
+      <div class="container">
+
+        <meta HTTP-EQUIV="REFRESH" content="10">
+
+        <div class="row">
+            <h3>Your CONTIGuator analysis is running...</h3>
+            <h4>This page will automatically refresh every 10 seconds</h4>
+            <p>You can also bookmark this page and come back later</p>
+        </div> <!-- /row -->
+
+      </div> <!-- /container -->
+{% endblock %}

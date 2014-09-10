@@ -1,0 +1,19 @@
+{% extends "template.html" %}
+{% block title %}CONTIGuator legend{% endblock %}
+{% block himg %}
+<img alt="CONTIGuator" src="{{ url_for('static', filename='img/logoweb.png') }}" class="bg-container img-responsive" />
+{% endblock %}
+{% block container %}
+      <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+            <h1>Map legend</h1>
+            </div>
+            <div class="col-md-8">
+<img alt="legend" src="{{ url_for('static', filename='img/legend.png') }}" class="bg-container img-responsive" />
+            
+            </div>
+        </div> <!-- /row -->
+
+      </div> <!-- /container -->
+{% endblock %}

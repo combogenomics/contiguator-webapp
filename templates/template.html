@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    {% block head %}
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="description" content="A bacterial genomes finishing tool for structural insights on draft genomes">
+    <meta name="author" content="Marco Galardini">
+
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/custom.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/validate.css') }}" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    </style>
+
+    <!-- Le first javascript -->
+    <script src="{{ url_for('static', filename='js/livevalidation_standalone.compressed.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    {% endblock %}
+  </head>
+
+  <body>
+    <div class="container">
+      <div id="home">
+        <div id="title">
+          <div class="row">
+            <noscript>
+              <div class="alert alert-error">
+                <strong>Whoops! You have javascript disabled</strong>
+                <br/>                
+                You won't be able to navigate through the pages of this site, sorry :(
+              </div>
+             </noscript>
+            <div class="col-md-6">
+              {% block himg %}
+              {% endblock %}
+            </div>
+            <div class="col-md-6">
+              <h1>CONTIGuator web server</h1>
+              <h5>An online bacterial genomes finishing tool for structural insights on draft genomes</h5>
+              {% block menu %}
+              {% endblock %}
+            </div>
+          </div> <!-- row -->
+        </div> <!-- title -->
+        
+        <hr>
+
+      {% block container %}
+      <div class="container">
+
+      </div> <!-- /container -->
+      {% endblock %}
+    </div> <!-- /home -->
+
+    <hr>
+      
+      <footer class="footer">
+        <div class="row">
+          <div class="col-md-3">
+            <h6>Brought to you by</h6>
+            <div class="muted">
+              <p>
+                <a href="http://www.unifi.it/dbefcb/" target="_blank">
+                  <img alt="Combo" src="{{ url_for('static', filename='img/combo.png') }}"  width="100" class="bg-container"/>
+                </a>
+              </p>
+              <p>
+                <a href="http://www.unifi.it/dbefcb/" target="_blank">Florence computational biology group</a>
+                <br>
+                <a href="http://www.unifi.it/dblage/" target="_blank">Department of evolutionary biology</a>
+                <br>
+                <a href="http://www.unifi.it/">University of Florence</a>
+              </p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <h6>Contacts</h6>
+            <div class="muted">
+              <p>
+                For feedbacks, bug reports and other informations:
+                <ul>
+                  <li><b>contiguator@googlegroups.com</b></li>
+                  <li><a href="https://groups.google.com/forum/?fromgroups#!forum/contiguator"><b>Users group</b></a></li>
+                  <li>mgalardini@unifi.it</li>
+                  <li>alessio.mengoni@unifi.it</li>
+                  <li>combo.unifi@gmail.com</li>
+                </ul>
+              </p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <h6>Cite us</h6>
+            <p class="muted">
+              <a href="http://www.scfbm.org/content/6/1/11/" target="_blank">
+              <strong>
+                CONTIGuator: a bacterial genomes finishing tool for structural insights on draft genomes
+              </strong>
+              </a><br />
+                Marco Galardini, Emanuele G Biondi, Marco Bazzicalupo and Alessio Mengoni<br />
+                Source Code for Biology and Medicine 2011, 6:11 doi:10.1186/1751-0473-6-11
+            </p>
+          </div>
+          <div class="col-md-3">
+            <h6>Offline</h6>
+            <p class="muted">
+              Dare to try it on your machine?
+              <br>
+              <a href="http://contiguator.sourceforge.net">
+              <strong>
+                CONTIGuator on sourceforge.net
+              </strong>
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.cookiesdirective.js') }}"></script>    
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $.cookiesDirective({
+            privacyPolicyUri: "{{ url_for('static', filename='privacy-policy.html') }}",
+            position: 'bottom',
+            explicitConsent: false,
+        });
+    });
+    </script>
+    <script src="{{ url_for('static', filename='js/misc.js') }}"></script>
+
+  </body>
+</html>

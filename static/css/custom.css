@@ -1,0 +1,38 @@
+.btn-huge {
+  padding: 12px 18px;
+  font-size: 18px;
+  line-height: normal;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+.btn-huge [class^="icon-"] {
+  margin-top: 2px;
+}
+.bg-container {
+    background: -moz-radial-gradient(center 45%, ellipse closest-corner, #ffffff, #E0E0E0 85%);
+    background: -webkit-radial-gradient(center 45%, ellipse closest-corner, #ffffff, #E0E0E0 70%);
+    background: -o-radial-gradient(center 45%, ellipse closest-corner, #ffffff, #E0E0E0 85%);
+    background: -ms-radial-gradient(center 45%, ellipse closest-corner, #ffffff, #E0E0E0 85%);
+    background: radial-gradient(center 45%, ellipse closest-corner, #ffffff, #E0E0E0 85%);
+}
+body {
+    background-color: #E0E0E0;
+    line-height: 16px;
+    font-size: 13px;
+}
+.table th {
+    font-weight: bold;
+    background-color: #B8B8B8;
+}
+h3 {
+    font-size: 20px;
+    line-height: 30px;
+}
+.lasterror {
+	color: red;
+}
+h1 {
+    font-size: 30px;
+    line-height: 20px;
+}

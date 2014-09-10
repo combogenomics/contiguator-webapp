@@ -1,0 +1,291 @@
+{% extends "template.html" %}
+{% block title %}CONTIGuator web server{% endblock %}
+{% block menu %}
+{% endblock %}
+{% block himg %}
+<img alt="CONTIGuator" src="{{ url_for('static', filename='img/logoweb.png') }}" class="bg-container img-responsive" />
+{% endblock %}
+{% block container %}
+      <div class="container">
+        <div class="row">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="col-md-6 col-md-offset-3">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+              <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <strong>{{ category }}</strong> {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+        </div> <!-- col -->
+      {% endwith %}
+      
+      <div class="row">
+		    <div class="col-md-6 col-md-offset-3">
+              <div class="alert alert-warning alert-dismissible" role="alert">
+                  <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                  The upload may take some time, please be patient!
+              </div>
+        </div>
+		                    
+	    </div><!-- row -->
+	
+	    <div class="row">
+          <div class="col-md-3">
+              <form role="form" enctype="multipart/form-data" action="/run" method="POST">
+                  
+                  <h3>Input files</h3>
+                  <p class="muted">Maximum file size is 50MB</p>
+                  
+                  <br>
+                  
+                  <b>Contig file</b> (FASTA)<br><input size="5" type="file" id="contigs" name="contigs"><br>
+                  <p id="contigcheck" class="muted"></p>
+                  
+                  <b>Reference file(s)</b> (FASTA)<br><input size="5" type="file" id="reference" name="reference" multiple="yes">
+                  <p id="referencecheck" class="muted"></p>
+                  <p class="muted"><i class="icon-arrow-up"></i> Use ONE reference genome</p>
+                  <p class="muted">If you wish to use more than one reference genome you should run one analysis for each reference</p>
+                  <br><br>
+                  <b>PTT files</b> (optional)<br><input size="5" type="file" name="pttfile" multiple="yes" id="ptt">
+                  <p id="pttcheck" class="muted"></p>
+                  
+
+          </div>
+          <div class="col-md-3">
+
+                  <h3>Contigs profiling</h3>
+                  
+                  <br>
+                  
+                  <b>Blast e-value</b><br>
+                  <input class="input-mini" type="text" name="evalue" value="1e-20" id="evalue"><br>
+                  <input type="checkbox" name="blastn"> <a id="tooltip1" href="#" data-toggle="tooltip" title="may improve the alignment on distant genomes"><b>Use blastn</b></a><br><br>
+                  <a id="tooltip2" href="#" data-toggle="tooltip" title="increase for large genomes"><b>Blast threads</b></a><br>
+                  <input class="input-mini" type="text" name="threads" value="1" id="threads">
+		          <br>
+                  <b>Contig length threshold</b><br>
+                  <input class="input-mini" type="text" name="contiglength" value="1000" id="contiglength">
+		          <br>
+                  <b>Contig coverage threshold (%)</b><br>
+                  <input class="input-mini" type="text" name="contigcoverage" value="20" id="contigcoverage">
+                  <br>
+                  <b>Hit length threshold</b><br>
+                  <input class="input-mini" type="text" name="hitlength" value="1100" id="hitlength"><br>
+                  <b>Multiple replicon threshold</b><br>
+                  <input class="input-mini" type="text" name="multitreshold" value="1.5" id="multitreshold"><br>
+                  <b>Gaps size for overlapping contigs</b><br>
+                  <input class="input-mini" type="text" name="numN" value="100" id="numN"><br>
+                  <input type="checkbox" name="non"> Do not use N to separate the contigs<br>
+
+          </div>
+          <div class="col-md-3">
+
+                  <h3>Primer picking</h3>
+                  
+                  <br>
+                  
+                  <input type="checkbox" name="pcr" value="0"> <b>Look for PCR primers</b><br>
+                  <div id="pcropt" style="display:none;">
+                     <br>
+                     <input type="checkbox" name="inner"> Compute also the inner primers<br><br>
+                     <b>Optimum primer size</b><br>
+                     <input class="input-mini" type="text" name="optsize" value="20" id="optsize"><br>
+                     <b>Minimum primer size</b><br>
+                     <input class="input-mini" type="text" name="minsize" value="18" id="minsize"><br>
+                     <b>Maximum primer size</b><br>
+                     <input class="input-mini" type="text" name="maxsize" value="27" id="maxsize"><br>
+                     <b>Optimum melting temperature (°C)</b><br>
+                     <input class="input-mini" type="text" name="opttemp" value="60" id="opttemp"><br>
+                     <b>Minimum melting temperature (°C)</b><br>
+                     <input class="input-mini" type="text" name="mintemp" value="57" id="mintemp"><br>
+                     <b>Maximum melting temperature (°C)</b><br>
+                     <input class="input-mini" type="text" name="maxtemp" value="63" id="maxtemp"><br>
+                     <b>Flanking region size</b><br>
+                     <input class="input-mini" type="text" name="flanksize" value="1000" id="flanksize"><br>
+                     <b>Minimum product size</b><br>
+                     <input class="input-mini" type="text" name="minprod" value="1000" id="minprod"><br>
+                     <b>Maximum product size</b><br>
+                     <input class="input-mini" type="text" name="maxprod" value="7000" id="maxprod"><br>
+                     <b>Optimum primer GC content (%)</b><br>
+                     <input class="input-mini" type="text" name="optgc" value="50" id="optgc"><br>
+                     <b>Minimum primer GC content (%)</b><br>
+                     <input class="input-mini" type="text" name="mingc" value="20" id="mingc"><br>
+                     <b>Maximum primer GC content (%)</b><br>
+                     <input class="input-mini" type="text" name="maxgc" value="80" id="maxgc"><br>
+                     <b>GC clamp</b><br>
+                     <input class="input-mini" type="text" name="gcclamp" value="1" id="gcclamp"><br>
+                     <b>How many bases should be excluded from the end of the contig?</b><br>
+                     <input class="input-mini" type="text" name="exclude" value="100" id="exclude"><br>
+                     <br>
+                  </div>
+
+          </div>
+          <div class="col-md-3">
+          
+                  <h3>Ready to go?</h3>
+                                  
+                  <b>Your email</b><br>
+                  <input class="input-medium" type="text" name="email" value="" placeholder="your@email.com" id="email"><br>
+                  <input type="checkbox" name="notification">Email notification<br><br>
+                  
+                  <b>Give this job a name</b> (optional)<br>
+                  <input class="input-medium" type="text" name="jobname" value="" placeholder="" id="jobname"><br>
+                  <br>  
+                  <button type="submit" class="btn btn-primary btn-huge">
+                    <i class="icon-forward icon-white"></i> Submit
+                  </button>
+                  
+                  <br>
+                  <br>
+                  <p class="muted"><i class="icon-info-sign"></i> the submitted genome data will be deleted right after job completion</p>
+                  <p class="muted"><i class="icon-info-sign"></i> the provided email may be used to monitor the server usage (and will remain anonymous)</p>
+
+              </form>
+            </div> <!-- row -->
+
+      </div> <!-- /container -->
+
+<script type="text/javascript">
+$('#contigs').bind('change', function() {
+  $("#contigcheck").text('File size: ' + Math.round( (this.files[0].size/1024/1024)*100 )/100 + ' MB');
+  
+  if ( Math.round( (this.files[0].size/1024/1024)*100 )/100 > 50 )
+    {
+      alert('You selected a file bigger than 50 MB!')
+      $( 'button[type="submit"]' ).attr( 'disabled', true );
+    }
+  else
+    {
+      if ( $( 'button[type="submit"]' ).prop( 'disabled' ) == true )
+      {
+        $( 'button[type="submit"]' ).attr( 'disabled', true );
+      }
+      else
+      {
+        $( 'button[type="submit"]' ).attr( 'disabled', false );
+      }
+    }
+});
+
+$('#reference').bind('change', function() {
+  $("#referencecheck").text('File size: ' + Math.round( (this.files[0].size/1024/1024)*100 )/100 + ' MB');
+  
+  if ( Math.round( (this.files[0].size/1024/1024)*100 )/100 > 50 )
+    {
+      alert('You selected a file bigger than 50 MB!')
+    }
+  else
+    {
+      if ( $( 'button[type="submit"]' ).prop( 'disabled' ) == true )
+      {
+        $( 'button[type="submit"]' ).attr( 'disabled', true );
+      }
+      else
+      {
+        $( 'button[type="submit"]' ).attr( 'disabled', false );
+      }
+      
+    }
+});
+
+$('#ptt').bind('change', function() {
+  $("#pttcheck").text('File size: ' + Math.round( (this.files[0].size/1024/1024)*100 )/100 + ' MB');
+  
+  if ( Math.round( (this.files[0].size/1024/1024)*100 )/100 > 50 )
+    {
+      alert('You selected a file bigger than 50 MB!')
+      $( 'button[type="submit"]' ).attr( 'disabled', true );
+    }
+  else
+    {
+      if ( $( 'button[type="submit"]' ).prop( 'disabled' ) == true )
+      {
+        $( 'button[type="submit"]' ).attr( 'disabled', true );
+      }
+      else
+      {
+        $( 'button[type="submit"]' ).attr( 'disabled', false );
+      }
+    }
+});
+
+$(function() {
+$('input[name="pcr"]').change(function(){
+    if($(this).is(':checked')){
+        $('#pcropt').show(200); 
+    }else{
+        $('#pcropt').hide(200);    
+    }
+})
+});
+
+var evalue = new LiveValidation('evalue',{ validMessage: 'OK', wait: 500 });
+evalue.add( Validate.Presence );
+evalue.add(Validate.Numericality, { minimum: 0, maximum: 10} );
+var threads = new LiveValidation('threads',{ validMessage: 'OK', wait: 500 });
+threads.add( Validate.Presence );
+threads.add(Validate.Numericality, { minimum: 1, maximum: 3} );
+var contiglength = new LiveValidation('contiglength',{ validMessage: 'OK', wait: 500 });
+contiglength.add( Validate.Presence );
+contiglength.add(Validate.Numericality, { minimum: 0} );
+var contigcoverage = new LiveValidation('contigcoverage',{ validMessage: 'OK', wait: 500 });
+contigcoverage.add( Validate.Presence );
+contigcoverage.add(Validate.Numericality, { minimum: 0, maximum: 100} );
+var hitlength = new LiveValidation('hitlength',{ validMessage: 'OK', wait: 500 });
+hitlength.add( Validate.Presence );
+hitlength.add(Validate.Numericality, { minimum: 0} );
+var multitreshold = new LiveValidation('multitreshold',{ validMessage: 'OK', wait: 500 });
+multitreshold.add( Validate.Presence );
+multitreshold.add(Validate.Numericality, { minimum: 1} );
+var numN = new LiveValidation('numN',{ validMessage: 'OK', wait: 500 });
+numN.add( Validate.Presence );
+numN.add(Validate.Numericality, { minimum: 0} );
+var optsize = new LiveValidation("optsize",{ validMessage: 'OK', wait: 500 });
+optsize.add( Validate.Presence );
+optsize.add(Validate.Numericality, { minimum: 0} );
+var minsize = new LiveValidation("minsize",{ validMessage: 'OK', wait: 500 });
+minsize.add( Validate.Presence );
+minsize.add(Validate.Numericality, { minimum: 0} );
+var maxsize = new LiveValidation("maxsize",{ validMessage: 'OK', wait: 500 });
+maxsize.add( Validate.Presence );
+maxsize.add(Validate.Numericality, { minimum: 0} );
+var opttemp = new LiveValidation("opttemp",{ validMessage: 'OK', wait: 500 });
+opttemp.add( Validate.Presence );
+opttemp.add(Validate.Numericality);
+var mintemp = new LiveValidation("mintemp",{ validMessage: 'OK', wait: 500 });
+mintemp.add( Validate.Presence );
+mintemp.add(Validate.Numericality);
+var maxtemp = new LiveValidation("maxtemp",{ validMessage: 'OK', wait: 500 });
+maxtemp.add( Validate.Presence );
+maxtemp.add(Validate.Numericality);
+var flanksize = new LiveValidation("flanksize",{ validMessage: 'OK', wait: 500 });
+flanksize.add( Validate.Presence );
+flanksize.add(Validate.Numericality, { minimum: 0} );
+var minprod = new LiveValidation("minprod",{ validMessage: 'OK', wait: 500 });
+minprod.add( Validate.Presence );
+minprod.add(Validate.Numericality, { minimum: 0} );
+var maxprod = new LiveValidation("maxprod",{ validMessage: 'OK', wait: 500 });
+maxprod.add( Validate.Presence );
+maxprod.add(Validate.Numericality, { minimum: 0} );
+var optgc = new LiveValidation("optgc",{ validMessage: 'OK', wait: 500 });
+optgc.add( Validate.Presence );
+optgc.add(Validate.Numericality, { minimum: 0, maximum: 100} );
+var mingc = new LiveValidation("mingc",{ validMessage: 'OK', wait: 500 });
+mingc.add( Validate.Presence );
+mingc.add(Validate.Numericality, { minimum: 0, maximum: 100} );
+var maxgc = new LiveValidation("maxgc",{ validMessage: 'OK', wait: 500 });
+maxgc.add( Validate.Presence );
+maxgc.add(Validate.Numericality, { minimum: 0, maximum: 100} );
+var gcclamp = new LiveValidation("gcclamp",{ validMessage: 'OK', wait: 500 });
+gcclamp.add( Validate.Presence );
+gcclamp.add(Validate.Numericality, { minimum: 0} );
+var exclude = new LiveValidation("exclude",{ validMessage: 'OK', wait: 500 });
+exclude.add( Validate.Presence );
+exclude.add(Validate.Numericality, { minimum: 0});
+var email = new LiveValidation('email',{ validMessage: 'OK', wait: 500 });
+email.add( Validate.Presence );
+email.add( Validate.Email );
+</script>
+{% endblock %}

@@ -1,0 +1,202 @@
+{% extends "template.html" %}
+{% block title %}CONTIGuator results{% endblock %}
+{% block himg %}
+<img alt="CONTIGuator" src="{{ url_for('static', filename='img/logoweb.png') }}" class="bg-container img-responsive" />
+{% endblock %}
+{% block menu %}
+            <a class="btn btn-success" href="/archive/{{ req_id }}">
+              <span class="glyphicon glyphicon-save"></span>
+               Download the results
+            </a>
+
+            <a class="btn btn-primary" href="/">
+              <span class="glyphicon glyphicon-repeat"></span>
+               Launch a new job
+            </a>
+
+            <p><span class="glyphicon glyphicon-flag"></span> the jobs are erased each saturday at 23:59 CET</p>
+{% endblock %}
+{% block container %}
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6 col-md-offset-3">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+              <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <strong>{{ category }}</strong> {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+          </div>
+        </div>
+
+        <div class="row">
+<div class="panel-group" id="accordion">
+ {% if genparams|length > 0 %}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+          General info
+        </a>
+      </h4>
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse">
+      <div class="panel-body">
+      {% for tit, text in genparams %}
+      <p><b>{{ tit }}</b>: {{ text  }}</p>
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+ {% if runparams|length > 0 %}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+          Analysis parameters
+        </a>
+      </h4>
+    </div>
+    <div id="collapseTwo" class="panel-collapse collapse">
+      <div class="panel-body">
+      {% for tit, text in runparams %}
+      <p><b>{{ tit }}</b>: {{ text  }}</p>
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+ {% if pcrparams|length > 0 %}
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
+          PCR parameters
+        </a>
+      </h4>
+    </div>
+    <div id="collapseThree" class="panel-collapse collapse">
+      <div class="panel-body">
+      {% for tit, text in pcrparams %}
+      <p><b>{{ tit }}</b>: {{ text  }}</p>
+      {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>  
+        </div>
+
+<div class="row">
+    <h1>General stats</h1>
+  <div class="col-md-6">
+    <table class="table table-condensed">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>#</th>
+          <th>bp</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in summary %}
+          {% if 'Input' in s[0] or 'Primers' in s[0] %}
+          <tr class="info">
+          {% elif 'UnMapped' in s[0] %}
+          <tr class="danger">
+          {% else %}
+          <tr class="success">
+          {% endif %}
+          <td>{{ s[0] }}</td>
+          <td>{{ s[1] }}</td>
+          {% if s|length > 2 %}
+          <td>{{ s[2] }}</td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="col-md-6">
+    <a class="btn btn-danger" href="/unmapped/{{ req_id }}">
+              <span class="glyphicon glyphicon-remove"></span>
+               Unmapped contigs
+            </a>
+  </div>
+</div>
+
+{% for m in mapdata %}
+<hr>
+
+<div class="row">
+<h1>Reference replicon {{ m['dir'].replace('Map_', '') }}</h1>
+  <div class="col-md-6">
+    <table class="table table-condensed">
+      <thead>
+        <tr>
+          <th></th>
+          <th>#</th>
+          <th>bp</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="info">
+          <td>Reference length</td>
+          <td></td>
+          <td>{{ m['reflen']  }}</td>
+        </tr>
+        <tr class="success">
+          <td>Mapped contigs</td>
+          <td>{{ m['mapped'] }}</td>
+          <td>{{ m['mappedbp']  }}</td>
+        </tr>
+        {% if 'pcr' in m %}
+        <tr class="info">
+          <td>PCR primers</td>
+          <td>{{ m['pcr'] }}</td>
+        </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+  <div class="col-md-6">
+    <a class="btn btn-primary" href="/mapped/{{ req_id }}/{{ m['dir'] }}">
+              <span class="glyphicon glyphicon-ok"></span>
+               Mapped contigs
+            </a> 
+    <a class="btn btn-success" href="/pdf/{{ req_id }}/{{ m['dir'] }}/{{ m['pdf'] }}">
+              <span class="glyphicon glyphicon-picture"></span>
+               Map in PDF
+            </a> 
+    <a class="btn btn-info" href="/scaffold/{{ req_id }}/{{ m['dir'] }}">
+              <span class="glyphicon glyphicon-repeat"></span>
+               Scaffold FASTA
+            </a>
+    {% if 'pcr' in m %}
+    <a class="btn btn-default" href="/pcr/{{ req_id }}/{{ m['dir'] }}">
+              <span class="glyphicon glyphicon-list"></span>
+               PCR primers
+            </a> 
+    
+    {% endif %} 
+  </div>
+</div>
+<div class="row">
+<img src="/png/{{ req_id }}/{{ m['dir'] }}/{{ m['png'] }}" class="img-responsive" /> 
+    <a class="btn btn-default btn-sm" href="/png/{{ req_id }}/{{ m['dir'] }}/{{ m['png'].replace('_small.png', '.png') }}">
+               Larger
+            </a> 
+    <a class="btn btn-default btn-sm" href="/legend">
+               Legend
+            </a> 
+
+</div>
+{% endfor %}
+
+      </div> <!-- /container -->
+{% endblock %}
