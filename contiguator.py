@@ -30,6 +30,21 @@ try:
 except ImportError:
     pass
 
+# Mail log setup
+try:
+    import mail_log as ml
+    if not app.debug:
+        import logging
+        mail_handler = ml.TlsSMTPHandler(ml.MAIL_HOST,
+                               ml.MAIL_FROM,
+                               ml.ADMINS, 'CONTIGuator-webapp Failed!',
+                               credentials=(ml.MAIL_USER,
+                                            ml.MAIL_PWD))
+        mail_handler.setLevel(logging.ERROR)
+        app.logger.addHandler(mail_handler)
+except ImportError:
+    pass
+
 # Init celery
 celery = make_celery(app)
 
