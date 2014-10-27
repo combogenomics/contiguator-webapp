@@ -37,3 +37,7 @@ Create a production.py file which can then be used to override the settings.py d
 Restart apache and start celery and redis.
 
 To update the server once the upstream repository has been updated, just run git pull and the restart apache and celery.
+
+Edit the mail_log.py file to setup the error logging through email.
+
+You may also want to set up a cron job to wipe out the uploads directly every now and then
