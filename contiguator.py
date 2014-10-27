@@ -516,7 +516,7 @@ def results(req_id):
             d['pdf'] = d['png'].rstrip('.png')
             # PCR?
             if 'PCRPrimers.tsv' in os.listdir(os.path.join(wdir, m)):
-                d['pcr'] = len(filter(lambda x: len(x) >= 5 or
+                d['pcr'] = len(filter(lambda x: len(x) >= 5 and
                                 'Left Contig' not in x[0],
                                 [x.rstrip().split('\t')
                                     for x in open(os.path.join(wdir, m,
