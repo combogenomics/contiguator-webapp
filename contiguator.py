@@ -220,12 +220,12 @@ def log(req_id):
     task_id = j['task_id']
 
     # Return the log, if present
+    h2c = req_id[:2]
     if not os.path.exists(os.path.join(
                               app.config['UPLOAD_FOLDER'],
                               h2c, req_id)):
         flash('Could not retrieve the log: is your job older than one week?', 'danger')
         return render_template('index.html')
-    h2c = req_id[:2]
     if 'CONTIGuator.log' not in os.listdir(os.path.join(
                                       app.config['UPLOAD_FOLDER'],
                                       h2c, req_id)):
@@ -312,12 +312,12 @@ def unmapped(req_id):
     task_id = j['task_id']
 
     # Return the file, if present
+    h2c = req_id[:2]
     if not os.path.exists(os.path.join(
                               app.config['UPLOAD_FOLDER'],
                               h2c, req_id)):
         flash('Could not retrieve the file: is your job older than one week?', 'danger')
         return render_template('index.html')
-    h2c = req_id[:2]
     if 'UnMappedContigs.txt' not in os.listdir(os.path.join(
                                       app.config['UPLOAD_FOLDER'],
                                       h2c, req_id, 'UnMappedContigs')):
@@ -344,12 +344,12 @@ def mapped(req_id, mdir):
     task_id = j['task_id']
 
     # Return the log, if present
+    h2c = req_id[:2]
     if not os.path.exists(os.path.join(
                               app.config['UPLOAD_FOLDER'],
                               h2c, req_id)):
         flash('Could not retrieve the file: is your job older than one week?', 'danger')
         return render_template('index.html')
-    h2c = req_id[:2]
     if 'MappedContigs.txt' not in os.listdir(os.path.join(
                                       app.config['UPLOAD_FOLDER'],
                                       h2c, req_id, mdir)):
@@ -405,12 +405,12 @@ def png(req_id, mdir, fname):
     task_id = j['task_id']
 
     # Return the log, if present
+    h2c = req_id[:2]
     if not os.path.exists(os.path.join(
                               app.config['UPLOAD_FOLDER'],
                               h2c, req_id)):
         flash('Could not retrieve the picture: is your job older than one week?', 'danger')
         return render_template('index.html')
-    h2c = req_id[:2]
     if fname not in os.listdir(os.path.join(
                                       app.config['UPLOAD_FOLDER'],
                                       h2c, req_id, mdir)):
@@ -435,12 +435,12 @@ def scaffold(req_id, mdir):
     task_id = j['task_id']
 
     # Return the log, if present
+    h2c = req_id[:2]
     if not os.path.exists(os.path.join(
                               app.config['UPLOAD_FOLDER'],
                               h2c, req_id)):
         flash('Could not retrieve the scaffold: is your job older than one week?', 'danger')
         return render_template('index.html')
-    h2c = req_id[:2]
     if 'PseudoContig.fsa' not in os.listdir(os.path.join(
                                       app.config['UPLOAD_FOLDER'],
                                       h2c, req_id, mdir)):
@@ -466,12 +466,12 @@ def pcr(req_id, mdir):
     task_id = j['task_id']
 
     # Return the log, if present
+    h2c = req_id[:2]
     if not os.path.exists(os.path.join(
                               app.config['UPLOAD_FOLDER'],
                               h2c, req_id)):
         flash('Could not retrieve the file: is your job older than one week?', 'danger')
         return render_template('index.html')
-    h2c = req_id[:2]
     if 'PCRPrimers.tsv' not in os.listdir(os.path.join(
                                       app.config['UPLOAD_FOLDER'],
                                       h2c, req_id, mdir)):
