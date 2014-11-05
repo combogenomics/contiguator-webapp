@@ -375,12 +375,12 @@ def pdf(req_id, mdir, fname):
     task_id = j['task_id']
 
     # Return the log, if present
+    h2c = req_id[:2]
     if not os.path.exists(os.path.join(
                               app.config['UPLOAD_FOLDER'],
                               h2c, req_id)):
         flash('Could not retrieve the document: is your job older than one week?', 'danger')
         return render_template('index.html')
-    h2c = req_id[:2]
     if fname not in os.listdir(os.path.join(
                                       app.config['UPLOAD_FOLDER'],
                                       h2c, req_id, mdir)):
