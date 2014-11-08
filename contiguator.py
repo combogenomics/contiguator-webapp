@@ -318,6 +318,12 @@ def unmapped(req_id):
                               h2c, req_id)):
         flash('Could not retrieve the file: is your job older than one week?', 'danger')
         return render_template('index.html')
+    if not os.path.exists(os.path.join(
+                              app.config['UPLOAD_FOLDER'],
+                              h2c, req_id, 'UnMappedContigs')):
+        flash('No contig has been mapped to yor genome; you'+
+               'may want to relaunch a new job with different parameters', 'danger')
+        return render_template('index.html')
     if 'UnMappedContigs.txt' not in os.listdir(os.path.join(
                                       app.config['UPLOAD_FOLDER'],
                                       h2c, req_id, 'UnMappedContigs')):
