@@ -321,7 +321,7 @@ def unmapped(req_id):
     if not os.path.exists(os.path.join(
                               app.config['UPLOAD_FOLDER'],
                               h2c, req_id, 'UnMappedContigs')):
-        flash('No contig has been mapped to yor genome; you'+
+        flash('No contig has been mapped to yor genome (or error occurred)); you'+
                'may want to relaunch a new job with different parameters', 'danger')
         return render_template('index.html')
     if 'UnMappedContigs.txt' not in os.listdir(os.path.join(
@@ -557,7 +557,10 @@ def results(req_id):
                     b = False
                     continue
                 summary.append(l.strip().split('\t'))
-        
+        # No summary stats = errors?      
+        if len(summary) == 0: 
+            return render_template('error.html', req_id=req_id)
+ 
         # Are there any Map_ directories there?
         maps = filter(lambda x: os.path.isdir(
                                     os.path.join(wdir, x)) and
