@@ -557,9 +557,9 @@ def results(req_id):
                     b = False
                     continue
                 summary.append(l.strip().split('\t'))
-        # No summary stats = errors?      
+        # No summary stats = errors? (or unmapped)     
         if len(summary) == 0: 
-            return render_template('error.html', req_id=req_id)
+            return render_template('nomapped.html', req_id=req_id)
  
         # Are there any Map_ directories there?
         maps = filter(lambda x: os.path.isdir(
