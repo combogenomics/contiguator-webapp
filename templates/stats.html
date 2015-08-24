@@ -1,0 +1,88 @@
+{% extends "template.html" %}
+{% block head %}
+{{ super() }}
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.0/d3.min.js' charset='utf-8'></script>
+<link href="{{ url_for('static', filename='css/metricsgraphics.css') }}" rel="stylesheet">
+<script src="{{ url_for('static', filename='js/metricsgraphics.min.js') }}" charset='utf-8'></script>
+{% endblock %}
+{% block title %}CONTIGuator statistics{% endblock %}
+{% block himg %}
+<img alt="CONTIGuator" src="{{ url_for('static', filename='img/logoweb.png') }}" class="bg-container img-responsive" />
+{% endblock %}
+{% block container %}
+      <div class="container">
+
+        <div class="row">
+          <div class="col-md-6 col-md-offset-3">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+              <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <strong>{{ category }}</strong> {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+            <div id='jobs'></div>
+            <div id='ips'></div>
+            <div id='emails'></div>
+
+            <a class="btn btn-primary btn-block" href="/medusa/">
+              <span class="glyphicon glyphicon-repeat"></span>
+               Back to the home
+            </a>
+
+          </div> <!-- /col -->
+        </div> <!-- /row -->
+
+      </div> <!-- /container -->
+{% endblock %}
+{% block scripts %}
+d3.json('stats/jobs', function(data) {
+            data = MG.convert.date(data, 'date', '%c');
+            MG.data_graphic({
+                title: "Number of jobs",
+                description: "Single jobs run by the server",
+                data: data,
+                full_width: true,
+                height: 200,
+                target: '#jobs',
+                x_accessor: 'date',
+                y_accessor: 'jobs',
+                interpolate: 'linear',
+                show_missing_background: false 
+            })
+        })
+d3.json('stats/ips', function(data) {
+            data = MG.convert.date(data, 'date', '%c');
+            MG.data_graphic({
+                title: "Number of users (IP address)",
+                description: "Single internet addresses that have run at least one job",
+                data: data,
+                full_width: true,
+                height: 200,
+                target: '#ips',
+                x_accessor: 'date',
+                y_accessor: 'ips',
+                interpolate: 'linear',
+                show_missing_background: false 
+            })
+        })
+d3.json('stats/emails', function(data) {
+            data = MG.convert.date(data, 'date', '%c');
+            MG.data_graphic({
+                title: "Number of users (Email address)",
+                description: "Single email addresses that have run at least one job",
+                data: data,
+                full_width: true,
+                height: 200,
+                target: '#emails',
+                x_accessor: 'date',
+                y_accessor: 'emails',
+                interpolate: 'linear',
+                show_missing_background: false 
+            })
+        })
+{% endblock %}

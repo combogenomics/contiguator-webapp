@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import json
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash, escape, Response, send_from_directory, send_file
 from werkzeug.utils import secure_filename
@@ -15,6 +16,9 @@ from worker import is_task_ready
 
 from store import add_job
 from store import retrieve_job
+from store import cumulative_jobs
+from store import unique_ips
+from store import unique_emails
 
 import settings
 
@@ -606,11 +610,25 @@ def results(req_id):
 
 @app.route('/stats')
 def stats():
-    # Here show the server statistics, using redis as datastore
-    # Generate plots on the fly using d3.js?
-    # Another function may be needed then to get jsons
-    flash('Not implemented yet', 'warning')
-    return render_template('index.html')
+    return render_template('stats.html')
+
+@app.route('/stats/jobs')
+def jobs():
+    return Response(json.dumps([{'date':x[1],
+                                 'jobs':x[0]} for x in cumulative_jobs()]),
+                    mimetype='text/plain')
+
+@app.route('/stats/ips')
+def ips():
+    return Response(json.dumps([{'date':x[1],
+                                 'ips':x[0]} for x in unique_ips()]),
+                    mimetype='text/plain')
+
+@app.route('/stats/emails')
+def emails():
+    return Response(json.dumps([{'date':x[1],
+                                 'emails':x[0]} for x in unique_emails()]),
+                    mimetype='text/plain')
 
 @app.route('/admin')
 def admin():
