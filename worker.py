@@ -15,6 +15,10 @@ def make_celery(app):
     celery.Task = ContextTask
     return celery
 
+def is_task_failed(task, task_id):
+    res = task.AsyncResult(task_id)
+    return res.failed()
+
 def is_task_ready(task, task_id):
     res = task.AsyncResult(task_id)
     return res.ready()

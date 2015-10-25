@@ -12,7 +12,7 @@ from utils import generate_hash
 from utils import generate_time_hash
 
 from worker import make_celery
-from worker import is_task_ready
+from worker import is_task_ready, is_task_failed
 
 from store import add_job
 from store import retrieve_job
@@ -54,6 +54,7 @@ celery = make_celery(app)
 
 # Later import after celery has been set up
 from tasks import run_contiguator
+from celery.exceptions import TimeLimitExceeded
 
 @app.route('/')
 def index():
@@ -515,8 +516,12 @@ def results(req_id):
 
     if is_task_ready(run_contiguator, task_id):
         # run results logics
-        success = run_contiguator.AsyncResult(task_id).get()
-        if not success:
+        try:
+            success = run_contiguator.AsyncResult(task_id).get()
+            if not success:
+                return render_template('error.html', req_id=req_id)
+        except TimeLimitExceeded:
+            flash('Job time limit exceeded', 'danger')
             return render_template('error.html', req_id=req_id)
 
         # Handle the results and prepare the data for page rendering
@@ -605,6 +610,9 @@ def results(req_id):
                                             pcrparams=pcrparams,
                                             summary=summary,
                                             maps=maps)
+    elif is_task_failed(run_contiguator, task_id):
+        flash('An error occurred, please try again', 'danger')
+        return render_template('error.html', req_id=req_id)	
     else:
         return render_template('waiting.html')
 
