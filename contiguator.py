@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
 import os
+import sys
+import subprocess
 import json
+import time
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash, escape, Response, send_from_directory, send_file
 from werkzeug.utils import secure_filename
@@ -10,9 +13,6 @@ from Bio import SeqIO
 
 from utils import generate_hash
 from utils import generate_time_hash
-
-from worker import make_celery
-from worker import is_task_ready, is_task_failed
 
 from store import add_job
 from store import retrieve_job
@@ -48,13 +48,6 @@ try:
         app.logger.addHandler(mail_handler)
 except ImportError:
     pass
-
-# Init celery
-celery = make_celery(app)
-
-# Later import after celery has been set up
-from tasks import run_contiguator
-from celery.exceptions import TimeLimitExceeded
 
 @app.route('/')
 def index():
@@ -165,43 +158,67 @@ def run():
             else:inner = False
             if 'blastn' in request.form:blastn = True
             else:blastn = False
-            result = run_contiguator.delay(wdir, dname, genomes,
-                    evalue=request.form.get('evalue', 1e-20),
-                    contiglength=request.form.get('contiglength', 1000),
-                    contigcoverage=request.form.get('contigcoverage', 20),
-                    hitlength=request.form.get('hitlength', 1100),
-                    multitreshold=request.form.get('multitreshold', 1.5),
-                    non=non,
-                    numN=request.form.get('numN', 100),
-                    pcr=pcr,
-                    inner=inner,
-                    blastn=blastn,
-                    threads=request.form.get('threads', 1),
-                    optsize=request.form.get('optsize', 20),
-                    minsize=request.form.get('minsize', 18),
-                    maxsize=request.form.get('maxsize', 27),
-                    opttemp=request.form.get('opttemp', 60),
-                    mintemp=request.form.get('mintemp', 57),
-                    maxtemp=request.form.get('maxtemp', 63),
-                    flanksize=request.form.get('flanksize', 1000),
-                    minprod=request.form.get('minprod', 1000),
-                    maxprod=request.form.get('maxprod', 7000),
-                    optgc=request.form.get('optgc', 50),
-                    mingc=request.form.get('mingc', 20),
-                    maxgc=request.form.get('maxgc', 80),
-                    gcclamp=request.form.get('gcclamp', 1),
-                    exclude=request.form.get('exclude', 100),
-                    jobname=request.form.get('jobname', ''))
-        except:
-            flash(u'Could not submit your job', 'danger')
+
+            evalue=request.form.get('evalue', 1e-20)
+            contiglength=request.form.get('contiglength', 1000)
+            contigcoverage=request.form.get('contigcoverage', 20)
+            hitlength=request.form.get('hitlength', 1100)
+            multitreshold=request.form.get('multitreshold', 1.5)
+            non=non
+            numN=request.form.get('numN', 100)
+            pcr=pcr
+            inner=inner
+            blastn=blastn
+            threads=request.form.get('threads', 1)
+            optsize=request.form.get('optsize', 20)
+            minsize=request.form.get('minsize', 18)
+            maxsize=request.form.get('maxsize', 27)
+            opttemp=request.form.get('opttemp', 60)
+            mintemp=request.form.get('mintemp', 57)
+            maxtemp=request.form.get('maxtemp', 63)
+            flanksize=request.form.get('flanksize', 1000)
+            minprod=request.form.get('minprod', 1000)
+            maxprod=request.form.get('maxprod', 7000)
+            optgc=request.form.get('optgc', 50)
+            mingc=request.form.get('mingc', 20)
+            maxgc=request.form.get('maxgc', 80)
+            gcclamp=request.form.get('gcclamp', 1)
+            exclude=request.form.get('exclude', 100)
+            jobname=request.form.get('jobname', 'CONTIGuator job')
+
+            cmd = 'python tasks.py %s %s %s ' % (req_id,
+                                                 wdir,
+                                                 dname)
+            cmd += '%s %s %s %s ' % (evalue, contiglength, contigcoverage, hitlength)
+            cmd += '%s %s %s %s %s %s ' % (multitreshold, non, numN, pcr, inner, blastn)
+            cmd += '%s %s %s %s %s %s ' % (threads, optsize, minsize, maxsize, opttemp, mintemp)
+            cmd += '%s %s %s %s %s %s %s ' % (maxtemp, flanksize, minprod, maxprod, optgc, mingc, maxgc)
+            cmd += '%s %s "%s" ' % (gcclamp, exclude, jobname)
+            cmd += ' '.join(genomes)
+            f = open(os.path.join(wdir, 'cmd.sh'), 'w')
+            f.write(cmd + '\n')
+            f.close()
+            cmd = 'at -q b -M now -f %s' % os.path.join(wdir, 'cmd.sh')
+            proc = subprocess.Popen(cmd,
+                                    shell=(sys.platform!="win32"),
+				    stdin=subprocess.PIPE,
+                                    stdout=subprocess.PIPE,
+				    stderr=subprocess.PIPE)
+	    out = proc.communicate()
+	    
+	    return_code = proc.returncode
+	    if return_code != 0:
+		raise Exception('%s'%str(out[1]))
+        except Exception as e:
+            flash(u'Could not submit your job "%s"' % e,
+                  'danger')
             return redirect(url_for('index'))
             
         try:
             # Send details to redis
-            add_job(req_id, request.remote_addr, hemail,
-                    result.task_id)
-        except:
-            flash(u'Could not save your job details', 'danger')
+            add_job(req_id, request.remote_addr, hemail)
+        except Exception as e:
+            flash(u'Could not save your job details (%s)' % e, 'danger')
             return redirect(url_for('index')) 
 
         return redirect(url_for('results',
@@ -216,13 +233,6 @@ def run():
 def log(req_id):
     # Get details from redis
     j = retrieve_job(req_id)
-
-    # If no data is present, then it may be a wrong req_id
-    if 'task_id' not in j:
-        flash(u'Could not retrieve your job details', 'warning')
-        return redirect(url_for('index')) 
-
-    task_id = j['task_id']
 
     # Return the log, if present
     h2c = req_id[:2]
@@ -247,13 +257,6 @@ def err(req_id):
     # Get details from redis
     j = retrieve_job(req_id)
 
-    # If no data is present, then it may be a wrong req_id
-    if 'task_id' not in j:
-        flash(u'Could not retrieve your job details', 'warning')
-        return redirect(url_for('index')) 
-
-    task_id = j['task_id']
-
     # Return the log, if present
     h2c = req_id[:2]
     if not os.path.exists(os.path.join(
@@ -276,13 +279,6 @@ def err(req_id):
 def archive(req_id):
     # Get details from redis
     j = retrieve_job(req_id)
-
-    # If no data is present, then it may be a wrong req_id
-    if 'task_id' not in j:
-        flash(u'Could not retrieve your job details', 'warning')
-        return redirect(url_for('index')) 
-
-    task_id = j['task_id']
 
     # Return the archive, if present
     h2c = req_id[:2]
@@ -308,13 +304,6 @@ def archive(req_id):
 def unmapped(req_id):
     # Get details from redis
     j = retrieve_job(req_id)
-
-    # If no data is present, then it may be a wrong req_id
-    if 'task_id' not in j:
-        flash(u'Could not retrieve your job details', 'warning')
-        return redirect(url_for('index')) 
-
-    task_id = j['task_id']
 
     # Return the file, if present
     h2c = req_id[:2]
@@ -347,13 +336,6 @@ def mapped(req_id, mdir):
     # Get details from redis
     j = retrieve_job(req_id)
 
-    # If no data is present, then it may be a wrong req_id
-    if 'task_id' not in j:
-        flash(u'Could not retrieve your job details', 'warning')
-        return redirect(url_for('index')) 
-
-    task_id = j['task_id']
-
     # Return the log, if present
     h2c = req_id[:2]
     if not os.path.exists(os.path.join(
@@ -378,13 +360,6 @@ def pdf(req_id, mdir, fname):
     # Get details from redis
     j = retrieve_job(req_id)
 
-    # If no data is present, then it may be a wrong req_id
-    if 'task_id' not in j:
-        flash(u'Could not retrieve your job details', 'warning')
-        return redirect(url_for('index')) 
-
-    task_id = j['task_id']
-
     # Return the log, if present
     h2c = req_id[:2]
     if not os.path.exists(os.path.join(
@@ -407,13 +382,6 @@ def pdf(req_id, mdir, fname):
 def png(req_id, mdir, fname):
     # Get details from redis
     j = retrieve_job(req_id)
-
-    # If no data is present, then it may be a wrong req_id
-    if 'task_id' not in j:
-        flash(u'Could not retrieve your job details', 'warning')
-        return redirect(url_for('index')) 
-
-    task_id = j['task_id']
 
     # Return the log, if present
     h2c = req_id[:2]
@@ -438,13 +406,6 @@ def scaffold(req_id, mdir):
     # Get details from redis
     j = retrieve_job(req_id)
 
-    # If no data is present, then it may be a wrong req_id
-    if 'task_id' not in j:
-        flash(u'Could not retrieve your job details', 'warning')
-        return redirect(url_for('index')) 
-
-    task_id = j['task_id']
-
     # Return the log, if present
     h2c = req_id[:2]
     if not os.path.exists(os.path.join(
@@ -468,13 +429,6 @@ def scaffold(req_id, mdir):
 def pcr(req_id, mdir):
     # Get details from redis
     j = retrieve_job(req_id)
-
-    # If no data is present, then it may be a wrong req_id
-    if 'task_id' not in j:
-        flash(u'Could not retrieve your job details', 'warning')
-        return redirect(url_for('index')) 
-
-    task_id = j['task_id']
 
     # Return the log, if present
     h2c = req_id[:2]
@@ -507,21 +461,16 @@ def results(req_id):
     # Get details from redis
     j = retrieve_job(req_id)
 
-    # If no data is present, then it may be a wrong req_id
-    if 'task_id' not in j:
-        flash(u'Could not retrieve your job details', 'warning')
-        return redirect(url_for('index')) 
-
-    task_id = j['task_id']
-
-    if is_task_ready(run_contiguator, task_id):
+    h2c = req_id[:2]
+    status = j['status']
+    if status == 'Job done':
         # run results logics
         try:
-            success = run_contiguator.AsyncResult(task_id).get()
-            if not success:
-                return render_template('error.html', req_id=req_id)
-        except TimeLimitExceeded:
-            flash('Job time limit exceeded', 'danger')
+            result = json.load(open(os.path.join(app.config['UPLOAD_FOLDER'],
+                                                 h2c, req_id, 'result.json')))
+        except Exception as e:
+            app.logger.error('Internal server error: %s\nRequest ID: %s' % (e, req_id))
+            flash(u'Internal server error: %s'%e, 'danger')
             return render_template('error.html', req_id=req_id)
 
         # Handle the results and prepare the data for page rendering
@@ -610,11 +559,29 @@ def results(req_id):
                                             pcrparams=pcrparams,
                                             summary=summary,
                                             maps=maps)
-    elif is_task_failed(run_contiguator, task_id):
-        flash('An error occurred, please try again', 'danger')
-        return render_template('error.html', req_id=req_id)	
+    elif status == 'Job failed':
+        error_msg = j.get('error', '')
+        app.logger.error('Internal server error: %s\nRequest ID: %s' % (error_msg,
+                         req_id))
+        flash(u'Internal server error: %s' % error_msg,
+               'danger')
+        return render_template('error.html', req_id=req_id)
     else:
-        return render_template('waiting.html')
+        # If too much time has passed, it means that the job has either failed
+        # or anything like that
+        cur_time = time.time()
+        start_time = float(j['time'])
+        delta_time = cur_time - start_time
+        if (60 * 15) < delta_time < (60 * 30):
+            flash(u'Your job exceeded 15 minutes, something might have gone wrong!' +
+                  u'Will try 15 more minutes before giving up',
+                  'danger')
+        elif delta_time > (60 * 30):
+            flash(u'Your job exceeded 30 minutes, something must have gone wrong!' +
+                  u'If your genomes are many (and big) you might want to run Medusa locally',
+                  'danger')
+            return render_template('error.html', req_id=req_id)
+        return render_template('waiting.html', status=status)
 
 @app.route('/stats')
 def stats():

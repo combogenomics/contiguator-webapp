@@ -6,12 +6,23 @@
 {% block container %}
       <div class="container">
 
-        <meta HTTP-EQUIV="REFRESH" content="10">
+        <meta HTTP-EQUIV="REFRESH" content="5">
 
         <div class="row">
-            <h3>Your CONTIGuator analysis is running...</h3>
-            <h4>This page will automatically refresh every 10 seconds</h4>
-            <p class="muted"><i class="icon-info"></i>Please note that the job has a 15 minutes time limit</p>            
+          <div class="col-md-6 col-md-offset-3">
+	{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+              <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <strong>{{ category }}</strong> {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+	{% endwith %}
+	    <h3><b>Current status:</b> {{ status }}</h3>
+	    <br/>
+            <h5>This page will automatically refresh every 5 seconds</h5>
             <p>You can also bookmark this page and come back later</p>
         </div> <!-- /row -->
 
