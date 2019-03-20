@@ -69,7 +69,7 @@ def run_contiguator(req_id, wdir, contigs, refs, evalue=1e-20, contiglength=1000
     update_job(req_id, 'status', 'Getting CONTIGuator version')
     # Program version
     try:
-        vcmd = 'python CONTIGuator.py --version'
+        vcmd = 'python2 CONTIGuator.py --version'
         proc = subprocess.Popen(vcmd,shell=(sys.platform!="win32"),
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,stderr=subprocess.PIPE,
@@ -82,7 +82,7 @@ def run_contiguator(req_id, wdir, contigs, refs, evalue=1e-20, contiglength=1000
 
     update_job(req_id, 'status', 'Preparing CONTIGuator command line')
     #Run CONTIGuator
-    cmd = 'python CONTIGuator.py -c "%s"'%(os.path.basename(contigs))
+    cmd = 'python2 CONTIGuator.py -c "%s"'%(os.path.basename(contigs))
     for ref in refs:
         cmd += ' -r "%s"'%(os.path.basename(ref))
         cmd += ' -e %s'%str(evalue)
