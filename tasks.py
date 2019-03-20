@@ -11,14 +11,17 @@ from Bio import SeqIO
 
 from store import update_job
 
-def run_cmd(cmd, ignore_error=False):
+def run_cmd(cmd, wdir=None, ignore_error=False):
     """
     Run a command line command
     Returns True or False based on the exit code
     """
+    if wdir is None:
+        wdir = os.getcwd()
     proc = subprocess.Popen(cmd,shell=(sys.platform!="win32"),
                     stdin=subprocess.PIPE,stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE)
+                    stderr=subprocess.PIPE,
+                    cwd=wdir)
     out = proc.communicate()
     return_code = proc.returncode
 
@@ -190,7 +193,7 @@ def run_contiguator(req_id, wdir, contigs, refs, evalue=1e-20, contiglength=1000
     #except:pass
 
     update_job(req_id, 'status', 'Running CONTIGuator')
-    if not run_cmd(cmd):
+    if not run_cmd(cmd, wdir):
         raise Exception('CONTIGuator execution halted!')
 
     update_job(req_id, 'status', 'Preparing output')
